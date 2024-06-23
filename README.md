@@ -55,5 +55,6 @@ This project provides firmware for the M5Stack Cardputer to control Philips Hue 
   - E: Set a random color
 
 ## Attribution
-If you make a fork of this code, please credit the original author (@keebasg).
+If you make a fork of this code, please credit the original author @keebasg and contributor @Elit3snip3r. You can find @Elit3snip3r's GitHub profile [here](https://github.com/Elitesniper06).
+
 
