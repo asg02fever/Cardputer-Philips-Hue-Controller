@@ -26,10 +26,11 @@ This project provides firmware for the M5Stack Cardputer to control Philips Hue 
    ```bash
    git clone https://github.com/yourusername/M5Stack-Cardputer-Philips-Hue-Controller.git
    cd M5Stack-Cardputer-Philips-Hue-Controller
+2. rename the folder "M5Stack-Cardputer-Philips-Hue-Controller-main" to "hue_cardputter"
 
-2. Open hue_cardputter.ino file in Arduino IDE.
+3. Open hue_cardputter.ino file in Arduino IDE.
 
-3. Replace the placeholders with your own information:
+4. Replace the placeholders with your own information:
    ```bash    
    WiFi SSID and password:
    const char* ssid = "YOUR_SSID";
@@ -42,7 +43,7 @@ This project provides firmware for the M5Stack Cardputer to control Philips Hue 
    Light IDs:
    int lightIDs[] = {1, 2, 3};
 
-4. Upload the firmware to your M5Stack Cardputer.
+5. Upload the firmware to your M5Stack Cardputer.
 
 ## Usage 
 
