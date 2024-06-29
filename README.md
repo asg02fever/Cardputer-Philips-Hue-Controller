@@ -42,6 +42,8 @@ This project provides firmware for the M5Stack Cardputer to control Philips Hue 
    
    Light IDs:
    int lightIDs[] = {1, 2, 3};
+   ```
+   you can get your api [there.](https://developers.meethue.com/develop/get-started-2/)by following the official instructions
 
 5. Upload the firmware to your M5Stack Cardputer.
 
