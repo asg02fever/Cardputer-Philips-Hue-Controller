@@ -57,6 +57,14 @@ This project provides firmware for the M5Stack Cardputer to control Philips Hue 
   - W: Adjust brightness between 50% and 100%
   - E: Set a random color
 
+
+## New UI
+![1](https://github.com/asg02fever/hue_cardputter/assets/163065176/2a8cbb4e-477b-46aa-bd0e-04f8b38fca26)
+
+![2](https://github.com/asg02fever/hue_cardputter/assets/163065176/1193cc37-ba12-43cd-a4b9-0fe87a8ea977)
+
+
+
 ## Attribution
 If you make a fork of this code, please credit the original author @keebasg and contributor @Elit3snip3r. You can find @Elit3snip3r's GitHub profile [here](https://github.com/Elitesniper06).
 
