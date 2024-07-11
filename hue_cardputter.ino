@@ -14,6 +14,8 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include "KEEBASG.h"  // Include the bitmap header file
+#include "QR.h"  // Include the bitmap header file
+#include "battery.h"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -66,29 +68,48 @@ void showBootImage() {
 }
 
 void displayMessage(const char* message, uint16_t color) {
-    M5.Lcd.fillScreen(TFT_BLACK);
+    M5.Lcd.fillScreen(BLACK);  // Clear the screen
+
+    // Draw rectangles
+    M5.Lcd.drawRoundRect(5, 8, 186, 23, 8, ORANGE);
+    M5.Lcd.drawRoundRect(5, 39, 186, 23, 8, ORANGE);
+    M5.Lcd.fillRoundRect(7, 41, 188, 24, 8, ORANGE);
+    M5.Lcd.fillRoundRect(7, 10, 188, 24, 8, ORANGE);
+    M5.Lcd.drawRoundRect(5, 70, 186, 23, 8, ORANGE);
+    M5.Lcd.fillRoundRect(7, 72, 188, 24, 8, ORANGE);
+    M5.Lcd.drawRoundRect(5, 101, 186, 23, 8, ORANGE);
+    M5.Lcd.fillRoundRect(7, 103, 188, 24, 8, ORANGE);
+
+    // Setting text color and size
+    M5.Lcd.setTextColor(BLACK);
     M5.Lcd.setTextSize(2);
-    M5.Lcd.setTextColor(TFT_CYAN);
-    M5.Lcd.setCursor(0, 20);
-    M5.Lcd.println("Light Control");
 
-    M5.Lcd.setTextSize(2);
-    M5.Lcd.setTextColor(TFT_WHITE);
-    M5.Lcd.setCursor(0, 40);
-    M5.Lcd.println("Q: Toggle Light");
+    // Drawing strings
+    M5.Lcd.drawString("R:About ", 13, 107);
+    M5.Lcd.drawString("E:Set Color", 13, 76);
+    M5.Lcd.drawString("Q:Toggle Light", 13, 14);
+    M5.Lcd.drawString("W:Brightness", 13, 45);
 
-    M5.Lcd.setCursor(0, 60);
-    M5.Lcd.println("W: Adjust Brightness");
+    // Drawing bitmaps based on state
+    M5.Lcd.drawBitmap(203, 70, image_Dehumidify_hvr_bits, 25, 27, WHITE);
+    
+    if (lightState) {
+        M5.Lcd.drawBitmap(203, 8, image_Power_hvr_bits, 25, 27, WHITE);
+    } else {
+        M5.Lcd.drawBitmap(203, 8, image_Power_off_bits, 25, 27,  WHITE);
+    }
 
-    M5.Lcd.setCursor(0, 80);
-    M5.Lcd.println("E: Change Color");
+    if (brightness == 254) {
+        M5.Lcd.drawBitmap(203, 39, image_HeatHi_hvr_bits, 25, 27, WHITE);
+    } else {
+        M5.Lcd.drawBitmap(203, 39, image_HeatHi_bits, 25, 27, WHITE);
+    }
 
-    M5.Lcd.setCursor(0, 100);
-    M5.Lcd.println("R: About");
+    M5.Lcd.drawBitmap(203, 107, image_menu_help_sign_black_bits, 15, 16, WHITE);
 
     M5.Lcd.setTextSize(1);
     M5.Lcd.setTextColor(color);
-    M5.Lcd.setCursor(0, 120);
+    M5.Lcd.setCursor(0, 135);
     M5.Lcd.println(message);
 }
 
@@ -142,15 +163,15 @@ void toggleBrightness() {
 void displayColorMenu(int selectedColor) {
     M5.Lcd.fillScreen(TFT_BLACK);
     M5.Lcd.setTextSize(2);
-    M5.Lcd.setTextColor(TFT_CYAN);
+    M5.Lcd.setTextColor(TFT_ORANGE);
     M5.Lcd.setCursor(0, 0);
     M5.Lcd.println("Select Color:");
-    M5.Lcd.setTextColor(TFT_GREEN);
+    M5.Lcd.setTextColor(TFT_ORANGE);
     M5.Lcd.setCursor(0, 15);
     M5.Lcd.println("press OK to confirm");
 
-    // Calculate maximum visible colors on the screen
-    int maxVisibleColors = M5.Lcd.height() / 20; // Assuming each color option is 20 pixels tall
+// Calculate maximum visible colors on the screen
+    int maxVisibleColors = M5.Lcd.height() / 30; // Increase spacing to 35 pixels between each option
 
     // Calculate starting index based on selected color and max visible colors
     int startIdx = selectedColor - maxVisibleColors / 2;
@@ -160,20 +181,26 @@ void displayColorMenu(int selectedColor) {
         startIdx = NUM_COLORS - maxVisibleColors;
     }
 
+    // Draw color options
     for (int i = startIdx; i < startIdx + maxVisibleColors; i++) {
         if (i >= 0 && i < NUM_COLORS) {
+            // Determine text and rectangle colors based on selection
             if (i == selectedColor) {
-                M5.Lcd.setTextSize(2);
-                M5.Lcd.setTextColor(TFT_GREEN);
+                M5.Lcd.setTextColor(TFT_BLACK);
+                M5.Lcd.drawRoundRect(3, 35 + (i - startIdx) * 30 - 2, 225, 26, 8, WHITE); // Outline 0xAAA0
+                M5.Lcd.fillRoundRect(5, 37 + (i - startIdx) * 30, 225, 22, 8, 0xAAA0); // Orange filled rectangle
             } else {
-                M5.Lcd.setTextSize(2);
                 M5.Lcd.setTextColor(TFT_WHITE);
+                M5.Lcd.drawRoundRect(3, 35 + (i - startIdx) * 30 - 2, 225, 26, 8, TFT_ORANGE); // Outline
+                M5.Lcd.fillRoundRect(5, 37 + (i - startIdx) * 30, 225, 22, 8, TFT_ORANGE); // Gray filled rectangle
             }
-            M5.Lcd.setCursor(0, 35 + (i - startIdx) * 20);
+            M5.Lcd.setTextSize(2);
+            M5.Lcd.setCursor(10, 40 + (i - startIdx) * 30); // Increased vertical spacing to 35 pixels
             M5.Lcd.println(colorNames[i]);
         }
     }
 }
+
 
 void selectColor() {
     displayColorMenu(selectedColor);
@@ -206,37 +233,39 @@ void selectColor() {
 
 
 void drawStatusBar() {
-    M5.Lcd.fillRect(0, 0, 320, 20, TFT_DARKGREY);
+    //M5.Lcd.fillRect(0, 0, 320, 20, TFT_DARKGREY);
+    M5.Lcd.drawBitmap(212, 2, battery, 24, 16, 0xFFFF);
     M5.Lcd.setTextColor(TFT_GREEN);
     M5.Lcd.setTextSize(1);
-    M5.Lcd.setCursor(5, 5);
-    M5.Lcd.print(WiFi.status() == WL_CONNECTED ? "WiFi: Connected" : "WiFi: Disconnected");
+    M5.Lcd.setCursor(140, 128);
+    M5.Lcd.print(WiFi.status() == WL_CONNECTED ? "Connected :" : "Disconnected :");
+    M5.Lcd.drawBitmap(215, 120, wifi, 19, 16, TFT_GREEN);
 }
 
 void showAboutPage() {
-    M5.Lcd.fillScreen(TFT_BLACK);
-    M5.Lcd.setTextSize(2);
-    M5.Lcd.setTextColor(TFT_CYAN);
-    M5.Lcd.setCursor(0, 10);
-    M5.Lcd.println("About");
-
-    M5.Lcd.setTextSize(2);
-    M5.Lcd.setTextColor(TFT_WHITE);
-    M5.Lcd.setCursor(0, 35);
-    M5.Lcd.println("This is a controler");
-    M5.Lcd.println("controler for");
-    M5.Lcd.println("Philips Hue lights.");
-
-    M5.Lcd.setCursor(0, 100);
-    M5.Lcd.println("Made by "); //@keebasg.
-    M5.Lcd.setTextColor(TFT_RED);
-    M5.Lcd.setCursor(90, 100);
-    M5.Lcd.println("@keebasg. ");
-    
-    M5.Lcd.setTextSize(1);
-    M5.Lcd.setTextColor(TFT_GREEN);
-    M5.Lcd.setCursor(0, 120);
-    M5.Lcd.println("Version: 2.2.1");
+   
+M5.Lcd.fillScreen(TFT_BLACK); 
+M5.Lcd.drawRoundRect(3, 6, 230, 121, 8, ORANGE);
+M5.Lcd.fillRoundRect(7, 10, 228, 119, 8, ORANGE);
+M5.Lcd.setTextColor(BLACK);
+M5.Lcd.setTextSize(2);
+M5.Lcd.drawString("This is a", 15, 19);
+M5.Lcd.drawString("controller for", 32, 41);
+M5.Lcd.drawString("Philips Hue lights", 12, 63);
+M5.Lcd.drawString("Press 'Q' or '`'", 32, 85);
+M5.Lcd.setTextColor(WHITE);
+M5.Lcd.setTextSize(2);
+M5.Lcd.drawString("This is a", 14, 18);
+M5.Lcd.drawString("controller for", 32, 40);
+M5.Lcd.drawString("Philips Hue lights", 12, 62);
+M5.Lcd.drawString("Press 'Q' or '`' ", 32, 84);
+M5.Lcd.setTextSize(1);
+M5.Lcd.drawString(" @Keebasg.", 58, 110);
+M5.Lcd.setTextColor(0xFFFF);
+M5.Lcd.drawString("Made by", 15, 110);
+M5.Lcd.setTextColor(0x0);
+M5.Lcd.drawString("Version 3.0", 15, 118);
+M5.Lcd.drawBitmap(212, 18, image_earth_bits, 15, 16, WHITE);
     
     while (true) {
         M5Cardputer.update();
@@ -245,6 +274,15 @@ void showAboutPage() {
              if (M5Cardputer.Keyboard.isKeyPressed('`')) {
                 displayMessage("Returning to main screen", TFT_YELLOW);
                 break; // Exit color selection mode
+            }
+        else if (M5Cardputer.Keyboard.isKeyPressed('q')) {
+                M5.Lcd.fillScreen(TFT_WHITE); 
+                M5.Lcd.drawBitmap(52, 0, 135, 135, QR);
+
+                if (M5Cardputer.Keyboard.isKeyPressed('`')) {
+                displayMessage("Returning to main screen", TFT_YELLOW);
+                break; // Exit color selection mode
+                }
             }
         }
     }
