@@ -2,6 +2,8 @@
 
 This project provides firmware for the M5Stack Cardputer to control Philips Hue lights. The firmware connects to a WiFi network and allows control of Philips Hue lights using the M5Stack Cardputer. The functionalities include toggling lights on and off, adjusting brightness, and setting random colors.
 
+![Screenshot 2024-07-27 155932](https://github.com/user-attachments/assets/1c2dc7a8-927b-467b-8670-5c9831dd775f)
+
 ## Features
 
 - Connects to a specified WiFi network.
